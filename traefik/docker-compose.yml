@@ -1,0 +1,51 @@
+version: '3.3'
+
+services:
+
+  traefik:
+    image: traefik:v2.2
+    ports:
+      # Listen on 80
+      - 80:80
+      # Listen on 443
+      - 443:443
+      # Listen on 53
+      - 53:53
+    deploy:
+      placement:
+        constraints:
+          - node.labels.traefik-public.traefik-public-certificates == true
+      labels:
+        - traefik.enable=true
+        - traefik.docker.network=traefik-public
+        - traefik.constraint-label=traefik-public
+        - traefik.http.services.traefik-public.loadbalancer.server.port=8080
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - traefik-public-certificates:/certificates
+    command:
+      - --providers.docker
+      - --providers.docker.constraints=Label(`traefik.constraint-label`, `traefik-public`)
+      - --providers.docker.exposedbydefault=false
+      - --providers.docker.swarmmode
+      # 80
+      - --entrypoints.http.address=:80
+      # 443
+      - --entrypoints.https.address=:443
+      # 53 (for proxying DNS)
+      - --entrypoints.https.address=:53
+      # ACME
+      - --certificatesresolvers.le.acme.email=${LE_EMAIL}
+      - --certificatesresolvers.le.acme.storage=/certificates/acme.json
+      - --certificatesresolvers.le.acme.tlschallenge=true
+    networks:
+      - traefik-public
+
+volumes:
+  # Holds the certificates
+  traefik-public-certificates:
+
+networks:
+  # Network for proxying
+  traefik-public:
+    external: true
