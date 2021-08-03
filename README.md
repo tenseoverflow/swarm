@@ -1,2 +1,3 @@
-# swarm
-Docker Swarm files for my server
+# Docker Swarm Files
+
+Collection of Docker swarm files for my personal servers.
