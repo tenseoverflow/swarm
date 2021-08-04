@@ -1,0 +1,68 @@
+version: "3.7"
+
+services:
+  adguardhome:
+    image: adguard/adguardhome:latest
+    networks:
+      - traefik-public
+    volumes:
+      - ./conf:/opt/adguardhome/conf
+      - ./work:/opt/adguardhome/work
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: any
+      update_config:
+        parallelism: 2
+        delay: 10s
+        order: stop-first
+        monitor: 10s
+      rollback_config:
+        parallelism: 2
+        delay: 10s
+        order: stop-first
+        monitor: 10s
+      labels:
+        - traefik.enable=true
+        - traefik.docker.network=traefik-public
+        - traefik.constraint-label=traefik-public
+        - traefik.http.routers.adguardhome-http.rule=Host(`dns.hen.ee`)
+        - traefik.http.routers.adguardhome-http.entrypoints=http
+        - traefik.http.routers.adguardhome-http.middlewares=https-redirect
+        - traefik.http.routers.adguardhome-https.rule=Host(`dns.hen.ee`)
+        - traefik.http.routers.adguardhome-https.entrypoints=https
+        - traefik.http.routers.adguardhome-https.tls=true
+        - traefik.http.routers.adguardhome-https.tls.certresolver=le
+        - traefik.http.services.adguardhome.loadbalancer.server.port=3000
+        # 53/udp
+        - traefik.udp.routers.adguardhome-dns-udp.entrypoints=dns-udp
+        - traefik.udp.routers.adguardhome-dns-udp.service=adguardhome-dns-udp
+        - traefik.udp.services.adguardhome-dns-udp.loadbalancer.server.port=53
+        # 53/tcp
+        - traefik.tcp.routers.adguardhome-dns-tcp.rule=HostSNI(`*`)
+        - traefik.tcp.routers.adguardhome-dns-tcp.entrypoints=dns-tcp
+        - traefik.tcp.routers.adguardhome-dns-tcp.service=adguardhome-dns-tcp
+        - traefik.tcp.services.adguardhome-dns-tcp.loadbalancer.server.port=53
+        # quic
+
+        # tls
+
+  unbound:
+    image: mvance/unbound:latest
+    networks:
+      for_unbound:
+    configs:
+      - source: searx-settings
+        target: /opt/unbound/etc/unbound/unbound.conf
+    restart: always
+
+
+networks:
+  traefik-public:
+    external: true
+  for_unbound:
+
+configs:
+  filtron-rules:
+    file: ./unbound.conf
