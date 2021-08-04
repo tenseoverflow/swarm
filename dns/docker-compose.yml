@@ -5,6 +5,7 @@ services:
     image: adguard/adguardhome:latest
     networks:
       - traefik-public
+      - for-unbound
     volumes:
       - ./conf:/opt/adguardhome/conf
       - ./work:/opt/adguardhome/work
@@ -51,7 +52,7 @@ services:
   unbound:
     image: mvance/unbound:latest
     networks:
-      for_unbound:
+      - for-unbound
     configs:
       - source: unbound-conf
         target: /opt/unbound/etc/unbound/unbound.conf
@@ -75,7 +76,7 @@ services:
 networks:
   traefik-public:
     external: true
-  for_unbound:
+  for-unbound:
 
 configs:
   unbound-conf:
