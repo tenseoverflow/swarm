@@ -53,9 +53,23 @@ services:
     networks:
       for_unbound:
     configs:
-      - source: searx-settings
+      - source: unbound-conf
         target: /opt/unbound/etc/unbound/unbound.conf
-    restart: always
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: any
+      update_config:
+        parallelism: 2
+        delay: 10s
+        order: stop-first
+        monitor: 10s
+      rollback_config:
+        parallelism: 2
+        delay: 10s
+        order: stop-first
+        monitor: 10s
 
 
 networks:
@@ -64,5 +78,5 @@ networks:
   for_unbound:
 
 configs:
-  filtron-rules:
+  unbound-conf:
     file: ./unbound.conf

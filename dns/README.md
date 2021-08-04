@@ -2,11 +2,11 @@
 
 ## Prerequisite
 
-Traefik proxy installed in Docker swarm as a proxy.
+Traefik installed in Docker swarm as a proxy.
 
 ## Deployment
 
-* `git clone https://`
+* `git clone https://github.com/tenseoverflow/swarm`
 * `cd ./dns`
 * `docker deploy -c docker-compose.yml dns`
 
