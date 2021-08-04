@@ -3,6 +3,9 @@ version: "3.7"
 services:
   adguardhome:
     image: adguard/adguardhome:latest
+    ports:
+      - 853:853
+      - 784:784
     networks:
       - traefik-public
       - for-unbound
@@ -28,26 +31,26 @@ services:
         - traefik.enable=true
         - traefik.docker.network=traefik-public
         - traefik.constraint-label=traefik-public
-        - traefik.http.routers.adguardhome-http.rule=Host(`dns.hen.ee`)
+
+        - traefik.http.routers.adguardhome-http.rule=Host(`dns.hen.ee`) # Change this
         - traefik.http.routers.adguardhome-http.entrypoints=http
         - traefik.http.routers.adguardhome-http.middlewares=https-redirect
-        - traefik.http.routers.adguardhome-https.rule=Host(`dns.hen.ee`)
+
+        - traefik.http.routers.adguardhome-https.rule=Host(`dns.hen.ee`) # Change this
         - traefik.http.routers.adguardhome-https.entrypoints=https
         - traefik.http.routers.adguardhome-https.tls=true
         - traefik.http.routers.adguardhome-https.tls.certresolver=le
+
         - traefik.http.services.adguardhome.loadbalancer.server.port=3000
         # 53/udp
-        - traefik.udp.routers.adguardhome-dns-udp.entrypoints=dns-udp
-        - traefik.udp.routers.adguardhome-dns-udp.service=adguardhome-dns-udp
-        - traefik.udp.services.adguardhome-dns-udp.loadbalancer.server.port=53
+        - traefik.udp.routers.adguardhome-dns.entrypoints=dns
+        - traefik.udp.routers.adguardhome-dns.service=adguardhome-dns
+        - traefik.udp.services.adguardhome-dns.loadbalancer.server.port=53
         # 53/tcp
-        - traefik.tcp.routers.adguardhome-dns-tcp.rule=HostSNI(`*`)
-        - traefik.tcp.routers.adguardhome-dns-tcp.entrypoints=dns-tcp
-        - traefik.tcp.routers.adguardhome-dns-tcp.service=adguardhome-dns-tcp
-        - traefik.tcp.services.adguardhome-dns-tcp.loadbalancer.server.port=53
-        # quic
-
-        # tls
+        #- traefik.tcp.routers.adguardhome-dns.rule=HostSNI(`*`)
+        - traefik.tcp.routers.adguardhome-dns.entrypoints=dns
+        - traefik.tcp.routers.adguardhome-dns.service=adguardhome-dns-tcp
+        - traefik.tcp.services.adguardhome-dns.loadbalancer.server.port=53
 
   unbound:
     image: mvance/unbound:latest

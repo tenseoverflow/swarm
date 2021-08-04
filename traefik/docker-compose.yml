@@ -11,6 +11,10 @@ services:
       - 443:443
       # Listen on 53
       - 53:53
+      # Listen on 853
+      #- 853:853
+      # Listen on 784
+      #- 784:784
     deploy:
       placement:
         constraints:
@@ -33,7 +37,11 @@ services:
       # 443
       - --entrypoints.https.address=:443
       # 53 (for proxying DNS)
-      - --entrypoints.https.address=:53
+      - --entrypoints.dns.address=:53
+      # 853 (DoT)
+      #- --entrypoints.dot.address=:853
+      # 784 (Quic)
+      #- --entrypoints.quic.address=:784
       # ACME
       - --certificatesresolvers.le.acme.email=${LE_EMAIL}
       - --certificatesresolvers.le.acme.storage=/certificates/acme.json
