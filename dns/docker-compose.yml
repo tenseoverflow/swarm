@@ -4,6 +4,7 @@ services:
   adguardhome:
     image: adguard/adguardhome:latest
     ports:
+      - 53:53
       - 853:853
       - 784:784
     networks:
@@ -43,14 +44,14 @@ services:
 
         - traefik.http.services.adguardhome.loadbalancer.server.port=3000
         # 53/udp
-        - traefik.udp.routers.adguardhome-dns.entrypoints=dns
-        - traefik.udp.routers.adguardhome-dns.service=adguardhome-dns
-        - traefik.udp.services.adguardhome-dns.loadbalancer.server.port=53
+        #- traefik.udp.routers.adguardhome-dns.entrypoints=dns
+        #- traefik.udp.routers.adguardhome-dns.service=adguardhome-dns
+        #- traefik.udp.services.adguardhome-dns.loadbalancer.server.port=53
         # 53/tcp
         #- traefik.tcp.routers.adguardhome-dns.rule=HostSNI(`*`)
-        - traefik.tcp.routers.adguardhome-dns.entrypoints=dns
-        - traefik.tcp.routers.adguardhome-dns.service=adguardhome-dns-tcp
-        - traefik.tcp.services.adguardhome-dns.loadbalancer.server.port=53
+        #- traefik.tcp.routers.adguardhome-dns.entrypoints=dns
+        #- traefik.tcp.routers.adguardhome-dns.service=adguardhome-dns-tcp
+        #- traefik.tcp.services.adguardhome-dns.loadbalancer.server.port=53
 
   unbound:
     image: mvance/unbound:latest

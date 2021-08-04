@@ -1,6 +1,6 @@
 # AdGuardHome DNS with Unbound
 
-## Prerequisite
+## Prerequisites
 
 Traefik installed in Docker swarm as a proxy.
 

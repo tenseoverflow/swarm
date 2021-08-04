@@ -10,7 +10,7 @@ services:
       # Listen on 443
       - 443:443
       # Listen on 53
-      - 53:53
+      #- 53:53
       # Listen on 853
       #- 853:853
       # Listen on 784
@@ -37,7 +37,7 @@ services:
       # 443
       - --entrypoints.https.address=:443
       # 53 (for proxying DNS)
-      - --entrypoints.dns.address=:53
+      #- --entrypoints.dns.address=:53
       # 853 (DoT)
       #- --entrypoints.dot.address=:853
       # 784 (Quic)
