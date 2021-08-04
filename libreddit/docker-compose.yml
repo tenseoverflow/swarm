@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+
+  server:
+    image: spikecodes/libreddit:latest
+    hostname: libreddit
+    networks:
+      - traefik-public
+    deploy:
+       mode: replicated
+       replicas: 1
+       restart_policy:
+         condition: any
+       update_config:
+         parallelism: 2
+         delay: 10s
+         order: stop-first
+         monitor: 10s
+       rollback_config:
+         parallelism: 2
+         delay: 10s
+         order: stop-first
+         monitor: 10s
+       labels:
+         - traefik.enable=true
+         - traefik.docker.network=traefik-public
+         - traefik.constraint-label=traefik-public
+         - traefik.http.routers.libreddit-http.rule=Host(`${LIBREDDIT_HOSTNAME}`)
+         - traefik.http.routers.libreddit-http.entrypoints=http
+         - traefik.http.routers.libreddit-http.middlewares=https-redirect
+         - traefik.http.routers.libreddit-https.rule=Host(`${LIBREDDIT_HOSTNAME}`)
+         - traefik.http.routers.libreddit-https.entrypoints=https
+         - traefik.http.routers.libreddit-https.tls=true
+         - traefik.http.routers.libreddit-https.tls.certresolver=le
+         - traefik.http.services.libreddit-https.loadbalancer.server.port=8080
+
+networks:
+  traefik-public:
+    external: true
